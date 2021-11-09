@@ -21,16 +21,17 @@ opcion7:        .asciiz "\nElegiste opcion 7\n"
 
 #addNode
 head:           .word   0
+tail:           .word   0
 getCategory: 		.asciiz "\n\tIngrese el nombre de la categoria: "
 successMessage: .asciiz "\n\tExito! categoria ingresada\n"
 endMessage:     .asciiz "\n\nFin del programa\n"
-buffer:         .space 16
+buffer:         .space  16
 
 firstNodeMessage:      .asciiz "\tAgrega la primer categoria\n"
 newNodeMessage:        .asciiz "\tAgrega una nueva categoria\n"
 
 #printList
-noObjects:      .asciiz "no tiene objetos ligados"
+noObjects:      .asciiz "\n\tno tiene objetos ligados\n"
 emptyList:      .asciiz "La lista esta vacia\n"
 asterisk:       .asciiz "\n\t*"
 colon:          .asciiz ": "
@@ -44,8 +45,6 @@ slist: .word 0
 
 .text
 main:
-      # head <= null
-      lw $s1, head
 
 loop:	  
       jal printMenu
@@ -77,6 +76,7 @@ loop:
 
     #hacer la invocacion de la funcion addNode
       la  $a0, head
+      la  $a1, tail
       jal addNode
 
 		  j loop
@@ -100,7 +100,7 @@ loop:
       syscall
 
     #hacer la invocacion de la funcion addNode
-      la  $a0, ($s1)
+      la  $a0, head
       jal printList
 
 		  j loop
@@ -168,6 +168,7 @@ getChoice:
 addNode:
     #recupero head desde $a0
         lw    $t0, ($a0)
+        lw    $t1, ($a1)
 
     #reservo memoria dinamica
         li    $v0, 9              #sbrk
@@ -175,20 +176,25 @@ addNode:
         syscall
         move  $t3, $v0            #almacena la dir. newNode
     
-    #pedir la categoria del nuevo nodo en $t3
+    #pedir la categoria del nuevo nodo en $t3 y hacer una reserva
         la   $a0, getCategory     #preguntamos el nombre de la cat
         li   $v0, 4               #syscall code for printing string
         syscall
 
+        li   $v0, 9
+        li   $a0, 16
+        syscall
+        sw   $v0, buffer
+
     #leemos el string ingresado
     #lee hasta encotrar el '\0' o llenar el buffer
         li   $v0, 8
-        la   $a0, buffer          #a0 ahora contiene la dir. del buffer
+        la   $a0, buffer          #a0 ahora contiene el buffer
         li   $a1, 16              #a1 ahora contiene el length
         syscall
 
     #almacena la categoria en el primer campo
-        la    $t4, buffer
+        lw    $t4, buffer
         sw    $t4, 0($t3)         #Feedback lucas
 
     #salvar retorno en la pila: apilar $ra
@@ -198,19 +204,24 @@ addNode:
     #if head es null agregamos el primer nodo
         bne   $t0, $0, addNewNode
 
-    #DEBUGG
+    #imprimir mensaje
         la    $a0, firstNodeMessage
         li    $v0, 4
         syscall
 
 addFirstNode: 
         la    $t0, ($t3)            #head ahora contiene la direccion de newnode
-        la    $t2, ($t3)            #tail ahora contiene la direccion de newnode
+        la    $t1, ($t3)            #tail ahora contiene la direccion de newnode
+    
+    #actualizar los punteros tail y head
+        sw    $t0, head
+        sw    $t1, tail
 
+    #llamar a la funcion para hcer enlaces
         la    $a0, ($t0)            #paso el head como parametro
-        la    $a1, ($t2)            #paso el tail como parametro
+        la    $a1, ($t1)            #paso el tail como parametro
         la    $a2, ($t3)            #paso el newNode como parametro
-        sw    $a2, head             #Feedback lucas
+
         jal   makelinksAddCategory
 
     #imprimir mensaje de exito
@@ -231,9 +242,8 @@ addNewNode:
         syscall
 
         la    $a0, ($t0)            #paso el head como parametro
-        la    $a1, ($t2)            #paso el tail como parametro
+        la    $a1, ($t1)            #paso el tail como parametro
         la    $a2, ($t3)            #paso el newNode como parametro
-        sw    $a0, head
         jal   makelinksAddCategory
 
 
@@ -242,7 +252,7 @@ addNewNode:
 makelinksAddCategory:
         sw    $a2, 8($a1)
         sw    $a1, 12($a2)
-        move  $a1, $a2
+        sw    $a2, tail
         sw    $a0, 8($a2)
         sw    $a2, 12($a0)
 
@@ -261,10 +271,10 @@ makelinksAddCategory:
 
 printList:
     #recupero head desde la variable head
-        lw    $t0, head             #feedback lucas
+        lw    $t0, ($a0)
 
     #inicializo el registro que recorre la lista: $t1
-        lw    $t1, ($t0)            #feedback lucas
+        la    $t1, ($t0)
 
     #if head es null la lista esta vacia
         beq    $t1, $0, catIsEmpty
@@ -285,66 +295,67 @@ doWhileCat:
         la     $a0, 0($t1)      #cargamos el nombre de la categoria
         li     $v0, 4           #syscall code for printing string
         syscall
+
+continuePrinting:
+    #bloque de codigo para imprimir objetos ligados a la cat
+          lw     $t2, 4($t1)      #headObj = current->obj;
+          move   $t3, $t2         #currentObject = headObj;
     
-#     #bloque de codigo para imprimir objetos ligados a la cat
-#           lw     $t2, 4($t1)      #headObj = current->obj;
-#           move   $t3, $t2         #currentObject = headObj;
-    
-#       #if currentObj es null entonces no tiene objetos ligados
-#           beq    $t3, $0, objIsEmpty
-#           and    $t7, $t7, $0     #contador iniciado a cero
+      #if currentObj es null entonces no tiene objetos ligados
+          beq    $t3, $0, objIsEmpty
+          and    $t7, $t7, $0     #contador iniciado a cero
 
-#       #sgundo patron con doWhile
-# doWhileObj:
-#           #imprimir "\n"
-#             la     $a0, newLine
-#             li     $v0, 4
-#             syscall
+      #sgundo patron con doWhile
+doWhileObj:
+          #imprimir "\n"
+            la     $a0, newLine
+            li     $v0, 4
+            syscall
 
-#           #imprimir count
-#             move   $a0, $t7
-#             li     $v0, 1
-#             syscall
+          #imprimir count
+            move   $a0, $t7
+            li     $v0, 1
+            syscall
 
-#           #imprimir colon
-#             la     $a0, colon
-#             li     $v0, 4
-#             syscall
+          #imprimir colon
+            la     $a0, colon
+            li     $v0, 4
+            syscall
 
-#           #imprimir object->content
-#             la     $a0, 0($t3)
-#             li     $v0, 4
-#             syscall
+          #imprimir object->content
+            la     $a0, 0($t3)
+            li     $v0, 4
+            syscall
 
-#           #imprimir comma
-#             la     $a0, comma
-#             li     $v0, 4
-#             syscall
+          #imprimir comma
+            la     $a0, comma
+            li     $v0, 4
+            syscall
 
-#           #imprimir "\t"
-#             la     $a0, tab
-#             li     $v0, 4
-#             syscall
+          #imprimir "\t"
+            la     $a0, tab
+            li     $v0, 4
+            syscall
 
-#           #imprimir id
-#             la     $a0, id
-#             li     $v0, 4
-#             syscall
+          #imprimir id
+            la     $a0, id
+            li     $v0, 4
+            syscall
 
-#           #imprimir object->ID
-#             la     $a0, 4($t3)
-#             li     $v0, 1
-#             syscall
+          #imprimir object->ID
+            la     $a0, 4($t3)
+            li     $v0, 1
+            syscall
 
-# nextObject:
-#       #currentObject = currentObject -> next;
-#         lw     $t3, 8($t3)
+nextObject:
+      #currentObject = currentObject -> next;
+        lw     $t3, 8($t3)
 
-#       #imprimir "\n"
-#         la     $a0, newLine
-#         li     $v0, 4
-#         syscall
-#     #fin bloque de codigo para imprimir objetos
+      #imprimir "\n"
+        la     $a0, newLine
+        li     $v0, 4
+        syscall
+    #fin bloque de codigo para imprimir objetos
 
 nextCategory:
         lw     $t1, 8($t1)      #current = current -> next;
@@ -365,7 +376,7 @@ currentCat:
         li     $v0, 4           #syscall code for printing string
         syscall
 
-        j doWhileCat
+        j continuePrinting
 
 catIsEmpty:
     #mostrar mensaje al user
@@ -392,7 +403,7 @@ objIsEmpty:
 #codigo profe
 smalloc: 
         lw      $t0, slist
-        beqz     $t0, sbrk
+        beqz    $t0, sbrk
         move    $v0, $t0
         lw      $t0, 12($t0)
         jr      $ra
