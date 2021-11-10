@@ -54,14 +54,9 @@ endDeleteObj:
 
         jr $ra
 
+          
 
-normalDelete:
-        #deleteAllObjects(*head)
-        #makeLinksDeleteCategory(head, tail)
-
-        j endDeleteObj
-
-
+          #funcion para borrar todos los objetos ligados a una categoria
 deleteAllObjects:
     # Obj *current  = NULL
         move  $t3, $0
@@ -94,6 +89,9 @@ doWhileDeletingObj:
 
         jr $ra 
 
+
+
+          # Caso de lista vacia
 emptyObjectList:
     #imprimo los mensajes correspondiente
         la    $a0, emptyObjectListMessage
@@ -105,3 +103,37 @@ emptyObjectList:
         syscall
 
         jr $ra 
+
+
+        #caso donde la lista tiene mas de un objeto
+normalDelete:
+        #deleteAllObjects(*head)
+        #makeLinksDeleteCategory(head, tail)
+
+        j endDeleteObj
+
+
+
+        #funcion para hacer los enlaces de borrado para una categoria
+makeLinksDeleteCategory:
+    # (*tail) = (*head) -> prev;
+        lw    $t3, 12($t0)
+        move  $t1, $t3
+        sw    $t1, tail
+    # aux = (*tail);
+        move  $t4, $t1
+    # aux -> next = (*head) -> next;
+        lw    $t5, 8($t0)
+        sw    $t5, 8($t4)
+    # aux = (*head) -> next;
+        move  $t4, $t5
+    # aux -> prev = (*head) -> prev
+        lw    $t5, 12($t0)
+        sw    $t5, 12($t4)
+    #llamo a la funcion liberar - QUIZAS HAYA ERROR ACA
+        move  $a0, $t0
+        jal   sfree
+    # (*head) = aux;
+        sw    $t4, head
+
+    jr  $ra
