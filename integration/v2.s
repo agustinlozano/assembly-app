@@ -195,8 +195,8 @@ addNode:
         li   $v0, 4               #syscall code for printing string
         syscall
 
-        li   $v0, 9
         li   $a0, 16
+        li   $v0, 9
         syscall
         sw   $v0, buffer
 
@@ -486,10 +486,11 @@ printCurrentCat:
 
 #codigo profe
 smalloc: 
-        lw      $t0, slist
-        beqz    $t0, sbrk
-        move    $v0, $t0
-        lw      $t0, 12($t0)
+        lw      $t7, slist
+        beqz    $t7, sbrk
+        move    $v0, $t7
+        lw      $t7, 12($t7)
+        sw      $t7, slist
         jr      $ra
 sbrk:
         li      $a0, 16
@@ -497,8 +498,8 @@ sbrk:
         syscall
         j $ra
 sfree: 
-        la      $t0, slist
-        sw      $t0, 12($a0)
+        la      $t7, slist
+        sw      $t7, 12($a0)
         sw      $a0, slist
         jr      $ra
 
