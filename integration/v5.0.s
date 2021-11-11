@@ -192,9 +192,9 @@ getChoice:
       syscall
 
       li    $v0, 5                 # syscall code for reading a int
-      syscall					             # read the int (it's now in $v0)
+      syscall                      # read the int (it's now in $v0)
 
-      jr $ra					             # return to caller with that value
+      jr $ra                       # return to caller with that value
 
 
 
