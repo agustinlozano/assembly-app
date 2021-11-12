@@ -4,7 +4,7 @@ A circular doubly linked list, also known as a circular two-way linked list, is 
 # La aplicación
 El proyecto se trata sobre desarrollar un programa que trabaje con estructuras de datos abstractas, la aplicación debe ser capaz de gestionar y relacionar información ligada a listas circulares doblemente enlazadas, para crear una estructura de dato única y de mayor complejidad. Para ello, el software tiene que estar dotado por una biblioteca que le permita realizar múltiples operaciones y enlaces entre los distintos nodos existentes en cada momento de su ejecución, así como utilizar la memoria dinámica del sistema. 
 
-![](https://github.com/agustinlozano/assembly-app/blob/master/src/img/Captura%20de%20pantalla%20de%202021-11-02%2014-50-40.png)
+![](https://github.com/agustinlozano/assembly-app/blob/master/src/Captura%20de%20pantalla%20de%202021-11-02%2014-50-40.png)
 
 Dada la complejidad del proyecto y la dificultad de codificación de bajo nivel que por naturaleza tiene el assembly, el programa fue previamente escrito y optimizado en lenguaje C.
 
