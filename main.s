@@ -1,4 +1,3 @@
-
                   .data
 options:          .asciiz "\nSeleccione una de las siguientes opciones:"
 crearCat:         .asciiz "\n\t1. Agregar nueva categoria"
