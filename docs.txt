@@ -28,6 +28,11 @@ o	Relacionada como aceleración fuerte
 o	Mejora el aprovechamiento de la paralelización
 neutralizando los efectos de la ley de Amdahl.
 
+[Hardware] QUE COMPLEJIDADES ITRODUCE LA DMA
+Las complejidades que introduce el DMA es que se requiere un modulo adicional capaz de imitar al procesador, y de recibir el control del sistema cedido por el procesador. Deebe ser utilizado solo cuando el procesador no lo necesita, o deberá forzar al procesador a que suspenda temporalmente su funcionamiento. Cuando la transferencia finaliza, el DMA libera el bus y envia una señal de interrupcion al procesador informando el estado de la operación. El procesador asi, solo interviene al comienzo y al final de una transferencia. Los
+
+DMA: son utiles para dispositivos de E/S con gran ancho de banda (ej: disco rígido), tienen mayor costo y complejidad.
+
 [HARDWARE, S.O.] QUE COMPLEJIDADES INTRODUCE INTERRUPCIONES
 Segun la bibliografía, es una de las cuestiones más difíciles de abordar a la hora de diseñar un procesador.
 
@@ -88,3 +93,15 @@ Como discutimos en clases, el uso de memoria virtual tiene una fuerte conexión 
 -	Realizar el emplazamiento de página. 
 -	Puede realizar un seguimiento sofisticado de la utilización de las páginas.
 -	Es quien accede y conoce al área de swap.
+
+[Memoria] Explique la politica de sustitucion de bloques en las caches de correspondencia directa y en asociativa
+La política de sustitucion de bloques en caché de correspondencia directa implica un bajo nivel de circuitería ya que en relacion con la
+memoria principal, a un elemento específico de la memoria principal le corresponde una única posición de la memoria caché. La
+sustitución de ese elemento sería muy sencillo porque se tendría que buscar una única posición. Matemáticamente, se habla del
+módulo: caché con 10 posiciones y una memoria principal con 100 elementos, al elemento 0 de la memoria principal le corresponde la
+posición 0 de la caché, como también el elemento 10.
+En cachés asociativas: requieren de circuiteria muy compleja ya que deben analizar en paralelo todas las etiquetas.
+Las politicas de sustituciones pueden ser:
+- Aleatorias
+- FIFO: first in, first out
+- MRU
