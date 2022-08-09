@@ -80,7 +80,7 @@ Los fallos en el sistema de memoria están relacionados a la capacidad de aciert
 Penalización
 La penalización por fallo es el tiempo necesario para reemplazar un bloque en el nivel superior por el correspondiente bloque del nivel inferior, al que hay que añadir el tiempo que se tarda en suministrar este bloque al procesador. El tamaño de bloque también es relevante en este aspecto, ya que a mayor bloque más grande la penalización.
 
-¿CUÁL ES EL PAPEL DEL S.O. EN MEMORIA VIRTUAL?
+[Memoria] ¿CUÁL ES EL PAPEL DEL S.O. EN MEMORIA VIRTUAL?
 Como discutimos en clases, el uso de memoria virtual tiene una fuerte conexión con el sistema operativo, solo aquellos computadores que dispongan de este tipo de software son los apropiados para dar soporte a la M.V. Algunas cuestiones y deberes que juega el S.O son:
 -	Realizar las traducciones a partir de ubicar el número de página requerido en una tabla de página y armar la dirección de memoria final junto con los bits del desplazamiento.
 -	Conocer el registro base de la página.
